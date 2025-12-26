@@ -28,11 +28,11 @@ wifi-visualizer/
 
 ## How to Run Backend 
 
-cd backend
-node server.js
+1. cd backend
+2. node server.js
 
 ## How to Run Frontend 
 
 cd frontend/wifi-visualizer
-npm install
-npm run dev
+1. npm install
+2.npm run dev
