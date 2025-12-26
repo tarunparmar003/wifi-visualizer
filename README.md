@@ -36,4 +36,4 @@ wifi-visualizer/
 cd frontend/wifi-visualizer
 
 1. npm install
-2.npm run dev
+2. npm run dev
