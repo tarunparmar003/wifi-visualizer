@@ -37,3 +37,4 @@ cd frontend/wifi-visualizer
 
 1. npm install
 2. npm run dev
+<img width="1885" height="853" alt="image" src="https://github.com/user-attachments/assets/ea3d053c-a617-4f69-81ad-859dc9cdcc43" />
