@@ -1,4 +1,5 @@
-const scanWiFi = require("../../scanner/wifiScanner");
+const scanWiFi = require("../scanner/wifiScanner");
+const getWifiAdapter = require("../scanner/wifiAdapter");
 const recommendChannel = require("./channelRecommend");
 
 let lastValidData = [];
@@ -6,14 +7,17 @@ let lastValidData = [];
 module.exports = (io) => {
   setInterval(() => {
     scanWiFi((err, data) => {
-      if (Array.isArray(data) && data.length > 0) {
+      if (!err && Array.isArray(data) && data.length) {
         lastValidData = data;
-      }
-
-      if (lastValidData.length > 0) {
         io.emit("wifi_data", lastValidData);
         io.emit("channel_recommendation", recommendChannel(lastValidData));
       }
     });
-  }, 15000);
+
+    getWifiAdapter((err, adapter) => {
+      if (!err && adapter) {
+        io.emit("wifi_adapter", adapter);
+      }
+    });
+  }, 5000);
 };

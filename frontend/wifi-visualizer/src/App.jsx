@@ -3,67 +3,79 @@ import { socket } from "./socket";
 import ChannelChart from "./ChannelChart";
 import SignalHistory from "./SignalHistory";
 
-function App() {
+export default function App() {
+  // 🔹 Nearby Wi-Fi networks
   const [aps, setAps] = useState([]);
+
+  // 🔹 My Wi-Fi card (adapter)
+  const [adapter, setAdapter] = useState(null);
+
+  // 🔹 Optional IP address
+  const [ip, setIp] = useState(null);
+
   const [status, setStatus] = useState("Connecting...");
-  const [recommend, setRecommend] = useState(null);
-  const [minSignal, setMinSignal] = useState(0);
 
   useEffect(() => {
     socket.on("connect", () => setStatus("Connected"));
-    socket.on("disconnect", () => setStatus("Reconnecting..."));
+    socket.on("disconnect", () => setStatus("Disconnected"));
 
-    socket.on("wifi_data", data => {
-      setAps(data);
-      setStatus("Connected");
-    });
+    // 🔹 All nearby Wi-Fi
+    socket.on("wifi_data", setAps);
 
-    socket.on("channel_recommendation", data => {
-      setRecommend(data);
-    });
+    // 🔹 My PC Wi-Fi card info
+    socket.on("wifi_adapter", setAdapter);
+
+    // 🔹 Optional IP
+    socket.on("my_ip", setIp);
 
     return () => socket.off();
   }, []);
 
-  const filtered = aps.filter(ap => ap.signal >= minSignal);
-
   return (
-    <div style={{ padding: 20, color: "white" }}>
-      <h1>Wi-Fi Dashboard</h1>
+    <div style={{ padding: 20 }}>
+      <h1>📡 Wi-Fi Visualizer</h1>
       <p>Status: <b>{status}</b></p>
 
-      {recommend && (
-        <div style={{ border: "1px solid green", padding: 10 }}>
-          Best Channel Recommended: <b>{recommend.bestChannel}</b>
+      {/* ================= MY WIFI CARD ================= */}
+      {adapter && (
+        <div style={{ border: "1px solid #22c55e", padding: 12, marginBottom: 20 }}>
+          <h3>🖥 My Wi-Fi Card</h3>
+          <p><b>Adapter:</b> {adapter.description || adapter.name}</p>
+          <p><b>MAC Address:</b> {adapter.mac}</p>
+          <p><b>Status:</b> {adapter.state}</p>
+          <p><b>Connected Wi-Fi:</b> {adapter.connectedSSID}</p>
+          <p><b>Signal Strength:</b> {adapter.signal}</p>
+          {ip && <p><b>IP Address:</b> {ip}</p>}
         </div>
       )}
 
-      <ChannelChart data={filtered} />
-
-      <SignalHistory data={filtered.slice(-10)} />
-
-      <div>
-        Min Signal:
-        <input
-          type="number"
-          value={minSignal}
-          onChange={e => setMinSignal(+e.target.value)}
-        />
+      {/* ================= SUMMARY ================= */}
+      <div style={{ marginBottom: 20 }}>
+        <h3>Nearby Wi-Fi Summary</h3>
+        <p><b>Total Wi-Fi Near Me:</b> {aps.length}</p>
       </div>
 
-      <table border="1" cellPadding="6">
+      {/* ================= CHANNEL CHART ================= */}
+      <ChannelChart data={aps} />
+
+      {/* ================= SIGNAL HISTORY ================= */}
+      <SignalHistory data={aps} />
+
+      {/* ================= WIFI TABLE ================= */}
+      <h3> Nearby Wi-Fi Networks</h3>
+      <table>
         <thead>
           <tr>
             <th>SSID</th>
-            <th>Signal</th>
+            <th>Signal (dBm)</th>
             <th>Channel</th>
           </tr>
         </thead>
         <tbody>
-          {filtered.map((ap, i) => (
+          {aps.map((ap, i) => (
             <tr key={i}>
               <td>{ap.ssid}</td>
-              <td>{ap.signal}%</td>
+              <td>{ap.signal}</td>
               <td>{ap.channel}</td>
             </tr>
           ))}
@@ -72,5 +84,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

@@ -1,18 +1,17 @@
-module.exports = function recommendChannel(data) {
-  const count = {};
-  data.forEach(ap => {
-    count[ap.channel] = (count[ap.channel] || 0) + 1;
-  });
+const rateChannels = require("./rateChannels");
+
+module.exports = function recommendChannel(networks) {
+  const scores = rateChannels(networks);
 
   let bestChannel = null;
   let min = Infinity;
 
-  for (const ch in count) {
-    if (count[ch] < min) {
-      min = count[ch];
+  for (const ch in scores) {
+    if (scores[ch] < min) {
+      min = scores[ch];
       bestChannel = ch;
     }
   }
 
-  return { bestChannel, congestion: count };
+  return { bestChannel, scores };
 };

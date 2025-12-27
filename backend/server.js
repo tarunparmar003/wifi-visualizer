@@ -2,7 +2,9 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const port  = process.env.port || 5000;
+require("dotenv").config();
+
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 const server = http.createServer(app);
@@ -18,6 +20,6 @@ app.use(express.json());
 
 require("./services/scanService")(io);
 
-server.listen(5000, () =>
-  console.log("Backend running on http://localhost:5000")
+server.listen(PORT, () =>
+  console.log(`Backend running on http://localhost:${PORT}`)
 );

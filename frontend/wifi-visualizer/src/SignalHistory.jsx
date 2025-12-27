@@ -1,42 +1,33 @@
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   LineElement,
   PointElement,
   LinearScale,
-  CategoryScale,
-  Tooltip,
-  Legend
+  CategoryScale
 } from "chart.js";
-import { Line } from "react-chartjs-2";
 
-ChartJS.register(
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Tooltip,
-  Legend
-);
+ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale);
 
-export default function SignalHistory({ data = [] }) {
-  if (data.length === 0) return null;
-
-  const labels = data.map((_, i) => i + 1);
-  const values = data.map(d => d.signal);
+export default function SignalHistory({ data }) {
+  if (!data || !data.length) return null;
 
   return (
-    <Line
-      data={{
-        labels,
-        datasets: [
-          {
-            label: "Signal Strength (%)",
-            data: values,
-            borderColor: "cyan",
-            tension: 0.3
-          }
-        ]
-      }}
-    />
+    <div style={{ marginBottom: 30 }}>
+      <h3> Signal Strength History</h3>
+      <Line
+        data={{
+          labels: data.map((_, i) => i + 1),
+          datasets: [
+            {
+              label: "Signal (dBm)",
+              data: data.map(d => d.signal),
+              borderColor: "#38bdf8",
+              tension: 0.3
+            }
+          ]
+        }}
+      />
+    </div>
   );
 }
